@@ -133,7 +133,8 @@ class ConstraintAgent:
         
         # 2.1 Parse user constraints via LLM if provided
         room_overrides = {}
-        user_global_overrides = {}
+        user_global_exterior = {}
+        user_global_interior = {}
         user_constraint_levels = {}
         user_descriptions = {}
         user_adjacency_overrides = []
@@ -152,8 +153,10 @@ class ConstraintAgent:
                             required_rooms[room] = count
                     if "room_overrides" in parsed and isinstance(parsed["room_overrides"], dict):
                         room_overrides = parsed["room_overrides"]
-                    if "global_overrides" in parsed and isinstance(parsed["global_overrides"], dict):
-                        user_global_overrides = parsed["global_overrides"]
+                    if "global_exterior_overrides" in parsed and isinstance(parsed["global_exterior_overrides"], dict):
+                        user_global_exterior = parsed["global_exterior_overrides"]
+                    if "global_interior_overrides" in parsed and isinstance(parsed["global_interior_overrides"], dict):
+                        user_global_interior = parsed["global_interior_overrides"]
                     if "user_constraint_levels" in parsed and isinstance(parsed["user_constraint_levels"], dict):
                         user_constraint_levels = parsed["user_constraint_levels"]
                     if "user_descriptions" in parsed and isinstance(parsed["user_descriptions"], dict):
@@ -234,14 +237,15 @@ class ConstraintAgent:
             "coverage_tol_fraction": 0.05
         }
         
-        # Inject user global overrides (route them cleanly between exterior and interior)
-        if user_global_overrides:
-            for k, v in user_global_overrides.items():
-                if k in interior and k not in exterior:
-                    interior[k] = v
-                else:
-                    # Known exterior keys or novel global constraints default to exterior
-                    exterior[k] = v
+        # Inject user global exterior overrides
+        if user_global_exterior:
+            for k, v in user_global_exterior.items():
+                exterior[k] = v
+                
+        # Inject user global interior overrides
+        if user_global_interior:
+            for k, v in user_global_interior.items():
+                interior[k] = v
         
         # 2.5 Apply Zone Specific Rules
         if zone:
@@ -311,8 +315,12 @@ class ConstraintAgent:
                 for k in overrides.keys():
                     if k not in constraint_levels:
                         constraint_levels[k] = "hard"
-        if user_global_overrides:
-            for k in user_global_overrides.keys():
+        if user_global_exterior:
+            for k in user_global_exterior.keys():
+                if k not in constraint_levels:
+                    constraint_levels[k] = "hard"
+        if user_global_interior:
+            for k in user_global_interior.keys():
                 if k not in constraint_levels:
                     constraint_levels[k] = "hard"
 
