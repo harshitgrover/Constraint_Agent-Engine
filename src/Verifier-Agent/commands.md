@@ -35,3 +35,11 @@ curl -X POST "http://127.0.0.1:8000/verify" \
      -H "Content-Type: application/json" \
      -d @demo_inputs/dynamic_interior.json
 ```
+
+**Generate JSON output directly with cURL:**
+```bash
+mkdir -p json_files && \
+curl -s -X POST "http://127.0.0.1:8000/verify" \
+     -H "Content-Type: application/json" \
+     -d @demo_inputs/dynamic_interior.json > json_files/interior_output.json
+```
