@@ -1,4 +1,4 @@
-# Constraint Agent & Entity Constraint Engine - Complete Architecture Guide
+# Constraint Agent - Complete Architecture Guide
 
 ## Overview
 This document serves as the comprehensive manual for the **Constraint Agent** and its underlying **Entity Constraint Engine**. 
@@ -55,17 +55,6 @@ python3 demodb.py
 ```
 *(This seeds two demo keys: `zoning_3ded7e729f3d` and `zoning_403aa1801269`)*
 
----
-
-## 3. Entity Constraint Engine (`src/entity_constraint_engine.py`)
-
-**What it does:** It acts as the internal database reader for the Constraint Agent. It is completely isolated per entity to ensure rules don't bleed across rooms.
-
-**How it works internally:**
-1.  When asked for rules regarding a `"bedroom"`, it connects to `database.db`.
-2.  It queries `EntitySpecs` to build `size_rules` (min areas, aspect ratios) and `feature_rules` (egress, windows, doors).
-3.  It then queries `RelationalRules` to find any adjacency or distance constraint where the `"bedroom"` is involved (either as Entity A or Entity B).
-4.  It packages this into a modular dictionary and returns it to the Constraint Agent.
 
 ---
 
@@ -96,34 +85,6 @@ python3 extract_file.py zoning_3ded7e729f3d
 ```
 *(This will generate `src/json_files/zoning_3ded7e729f3d.json`)*
 
----
-
-## 6. Testing the Entity Constraint Engine
-
-To debug or query the raw baseline rules for a specific entity type (e.g. what are the default rules for a bedroom?), run the engine directly. You can pass multiple entities separated by spaces, or pass `all` to output everything. The outputs are automatically saved to the `src/Entity_Constraints` folder.
-
-*(Currently available entities: `bedroom`, `bathroom`, `kitchen`, `living`, `dining`, `corridor`, `laundry`, `garage`, `balcony`)*
-
-**For a specific room:**
-```bash
-cd src
-python3 entity_constraint_engine.py bedroom
-```
-*(Generates `src/Entity_Constraints/bedroom.json`)*
-
-**For multiple specific rooms:**
-```bash
-cd src
-python3 entity_constraint_engine.py bedroom bathroom kitchen
-```
-*(Generates `src/Entity_Constraints/bedroom_bathroom_kitchen.json`)*
-
-**For all rooms at once:**
-```bash
-cd src
-python3 entity_constraint_engine.py all
-```
-*(Generates `src/Entity_Constraints/all_entities.json`)*
 
 ---
 
